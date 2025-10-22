@@ -1,0 +1,7 @@
+[project]
+name = "understanding-ux-with-personality-driven-llm-chatbots"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
