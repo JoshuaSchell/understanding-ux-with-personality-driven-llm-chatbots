@@ -1,11 +1,43 @@
 #app {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  flex-direction: row;
   margin: 0 auto;
+  height: 100vh;
+  width: 100%;
+}
+
+#menu {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  justify-content: start;
+  margin-top: 100px;
+}
+
+button {
+  margin: 8px;
+  padding: 12px 16px;
+  border: 1px solid #111827;
+  background: #ffffff;
+  color: #000000;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 0px;
+  width: 128px;
+  font-weight: bold;
+  font-size: large;
+}
+
+#chat {
+  display: flex;
+  flex-direction: column;
+  height:80%;
+  width: 80%;
   background-color: #f6f7fb;
-  height: 90dvh;
-  width: 90dvw;
+  margin: 32px;
+  border: 1px solid #818897;
+  margin-left: 0px;
 }
 
 #header {
