@@ -2,6 +2,8 @@ import ollama
 from flask import Flask, jsonify, request
 import json
 from pathlib import Path
+import uuid
+from datetime import datetime
 
 # Constant Globals
 ALLOWED_BOT_CODES = {0, 1, 2}
@@ -15,6 +17,7 @@ PROMPTS = {
 # Session Globals
 current_bot = None
 messages = []
+user_anon_id = None
 
 
 app = Flask(__name__)
@@ -23,19 +26,23 @@ app = Flask(__name__)
 @app.route("/api/initialize", methods=["POST"])
 def initialize():
     """"""
+    global user_anon_id
     global current_bot
     global messages
     global ALLOWED_BOT_CODES
     global BASE_MODEL
     global PROMPTS
 
+    if user_anon_id is None:
+        user_anon_id = f"{datetime.now().strftime("%Y%m%d%H%M%S%f")}_{uuid.uuid4()}"
+
     data = request.get_json(force=True)
 
-    if "bot" not in data:
+    if "id" not in data:
         return jsonify({"error": "bot is required"}), 400
 
     try:
-        bot = int(data["bot"])
+        bot = int(data["id"])
     except:
         return jsonify({"error": "bot must be an integer."}), 400
 
@@ -48,7 +55,7 @@ def initialize():
         ), 400
 
     if messages:
-        path = Path("./chats/") / f"{current_bot}"
+        path = Path("./chats/") / f"{user_anon_id}_{current_bot}"
         with path.open("w", encoding="utf-8") as f:
             json.dump(messages, f, indent=2)
 
@@ -79,7 +86,4 @@ def message():
 
 
 if __name__ == "__main__":
-
-    messages = [{"role": "system", "content": PROMPTS[0]}]
-
     app.run(host="0.0.0.0", port=8000)
