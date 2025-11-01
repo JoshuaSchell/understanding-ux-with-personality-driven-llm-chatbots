@@ -24,24 +24,23 @@ export default function App() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
-  const sendInitalize = async () => {
-
-    try {
-      setBusy(true);
-      console.log("Sending body:", { id: current_ID });
-      const res = await fetch("/api/initialize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: current_ID }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    } catch (err: any) {
-      console.error(err);      
-    } finally {
-      setBusy(false);
-    }
-  };
+  const sendInitalize = async (id: number) => {
+  console.log("Initializing bot with ID:", id);
+  try {
+    setBusy(true);
+    console.log("Sending body:", { id });
+    const res = await fetch("/api/initialize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  } catch (err: any) {
+    console.error(err);
+  } finally {
+    setBusy(false);
+  }
+};
 
   const send = async () => {
     const text = draft.trim();
@@ -107,7 +106,7 @@ export default function App() {
 
   const handleBotChange = (botIndex: number) => {
     setCurrent_ID(botIndex);
-    void sendInitalize();
+    void sendInitalize(botIndex);
   }
 
   const buttons = ["Ada", "Maya", "Evi"];
