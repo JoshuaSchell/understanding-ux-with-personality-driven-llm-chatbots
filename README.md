@@ -26,4 +26,4 @@ npm install
 npm run dev
 ```
 
-# NOTE: both the front-end and back-end have to be running at the same time.
+- **NOTE: both the front-end and back-end have to be running at the same time.**
