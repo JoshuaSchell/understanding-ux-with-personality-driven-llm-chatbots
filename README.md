@@ -9,8 +9,8 @@
 
 ## To run the backend:
 
-uv run main.py
+uv run main.py (from project root)
 
 ## To run the frontend:
 
-npm run dev (inside bot_ui)
+npm run dev (inside bot_ui folder)
