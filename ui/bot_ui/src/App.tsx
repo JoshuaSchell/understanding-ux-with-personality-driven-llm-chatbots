@@ -7,6 +7,16 @@ export type ChatMessage = {
   text: string;
   ts?: number; // optional timestamp
 };
+const bots_unrandomized : [string , number][] = [["Ada", 0], ["Maya", 1], ["Evi", 2]];
+const bots = shuffle(bots_unrandomized);
+  function shuffle<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
 export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -14,6 +24,13 @@ export default function App() {
     { id: crypto.randomUUID(), bot: 1, from: "bot", text: "Hey I'm Maya" },
     { id: crypto.randomUUID(), bot: 2, from: "bot", text: "Hey I'm Evi" },
   ]);
+
+  useEffect(() => {
+    console.log("Page loaded!");
+    setCurrent_ID(bots[0][1]);
+    sendInitalize(bots[0][1]); // 👈 call your function here
+  }, []); 
+
 
   const [current_ID, setCurrent_ID] = useState<number>(0);
   const [draft, setDraft] = useState("");
@@ -108,32 +125,31 @@ export default function App() {
     setCurrent_ID(botIndex);
     void sendInitalize(botIndex);
   }
+  
 
-  const buttons = ["Ada", "Maya", "Evi"];
 
   return (
-    
     <div id="app">
       <div id="menu">
-        {buttons.map((buttonName) => (
+        {bots.map((bot) => (
         <button
-          key={buttonName}
-          onClick={() => handleBotChange(buttons.indexOf(buttonName))}
+          key={bot[1]}
+          onClick={() => handleBotChange(bot[1])}
           style={{
-            backgroundColor: current_ID === buttons.indexOf(buttonName) ? 'lightblue' : 'white',
+            backgroundColor: current_ID === bot[1] ? 'lightblue' : 'white',
             border: '1px solid gray',
             padding: '8px 16px',
             margin: '4px',
             cursor: 'pointer',
           }}
         >
-          {buttonName}
+          {bot[0]}
         </button>
       ))}
       </div>
       <div id="chat">
       <header id="header">
-        <strong>{buttons[current_ID]}</strong>
+        <strong>{bots.find(([_, id]) => id === current_ID)?.[0]}</strong>
         <div style={{ flex: 1 }} />
       </header>
       <main id="list">
