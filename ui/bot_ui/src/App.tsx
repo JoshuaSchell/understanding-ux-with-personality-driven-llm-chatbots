@@ -8,7 +8,7 @@ export type ChatMessage = {
   ts?: number; // optional timestamp
 };
 const bots_unrandomized : [string , number][] = [["Ada", 0], ["Maya", 1], ["Evi", 2]];
-const bots = shuffle(bots_unrandomized);
+const bots_randomized = shuffle(bots_unrandomized);
   function shuffle<T>(array: T[]): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -25,39 +25,44 @@ export default function App() {
     { id: crypto.randomUUID(), bot: 2, from: "bot", text: "Hey I'm Evi" },
   ]);
 
-  useEffect(() => {
-    console.log("Page loaded!");
-    setCurrent_ID(bots[0][1]);
-    sendInitalize(bots[0][1]); // 👈 call your function here
-  }, []); 
-
-
   const [current_ID, setCurrent_ID] = useState<number>(0);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement | null>(null);
+  const [botIndex, setBotIndex] = useState<number>(0);
+  const [bots, setBots] = useState<[string, number][]>(bots_randomized);
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (initializedRef.current) return; // already ran once
+    initializedRef.current = true;
+
+    console.log("Page loaded!");
+    setCurrent_ID(bots[0][1]);
+    void sendInitalize(bots[0][1]);
+  }, [bots]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
   const sendInitalize = async (id: number) => {
-  console.log("Initializing bot with ID:", id);
-  try {
-    setBusy(true);
-    console.log("Sending body:", { id });
-    const res = await fetch("/api/initialize", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  } catch (err: any) {
-    console.error(err);
-  } finally {
-    setBusy(false);
-  }
-};
+    console.log("Initializing bot with ID:", id);
+    try {
+      setBusy(true);
+      console.log("Sending body:", { id });
+      const res = await fetch("/api/initialize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const send = async () => {
     const text = draft.trim();
@@ -121,32 +126,16 @@ export default function App() {
 
   };
 
-  const handleBotChange = (botIndex: number) => {
-    setCurrent_ID(botIndex);
-    void sendInitalize(botIndex);
+  const handleBotChange = () => {
+    const id = bots[botIndex + 1][1];
+    setBotIndex(botIndex + 1);
+    setCurrent_ID(id);
+    void sendInitalize(id);
   }
   
 
-
   return (
     <div id="app">
-      <div id="menu">
-        {bots.map((bot) => (
-        <button
-          key={bot[1]}
-          onClick={() => handleBotChange(bot[1])}
-          style={{
-            backgroundColor: current_ID === bot[1] ? 'lightblue' : 'white',
-            border: '1px solid gray',
-            padding: '8px 16px',
-            margin: '4px',
-            cursor: 'pointer',
-          }}
-        >
-          {bot[0]}
-        </button>
-      ))}
-      </div>
       <div id="chat">
       <header id="header">
         <strong>{bots.find(([_, id]) => id === current_ID)?.[0]}</strong>
@@ -188,6 +177,14 @@ export default function App() {
         </button>
       </form>
     </div>
+    <div id = "next-bot-container">
+    <button
+          onClick={() => handleBotChange()}
+          disabled={botIndex >= bots.length - 1}
+        >
+        I'm done, Move onto next conversation
+        </button>
+        </div>
     </div>
   );
 }
