@@ -1,5 +1,6 @@
 import ollama
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import json
 from pathlib import Path
 import uuid
@@ -7,7 +8,7 @@ from datetime import datetime
 
 # Constant Globals
 ALLOWED_BOT_CODES = {0, 1, 2}
-BASE_MODEL = 'qwen2:7b'
+BASE_MODEL = 'gpt-oss:20b'
 
 with open("ada.txt", "r", encoding="utf-8") as f:
     ada_text = f.read()
@@ -30,6 +31,7 @@ user_anon_id = None
 
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 
 @app.route("/api/initialize", methods=["POST"])
@@ -41,9 +43,9 @@ def initialize():
     global ALLOWED_BOT_CODES
     global BASE_MODEL
     global PROMPTS
-    
+
     if user_anon_id is None:
-        user_anon_id = f"{datetime.now().strftime("%Y%m%d%H%M%S%f")}_{uuid.uuid4()}"
+        user_anon_id = f"{uuid.uuid4()}"
 
     data = request.get_json(force=True)
 
@@ -64,7 +66,7 @@ def initialize():
         ), 400
 
     if messages:
-        path = Path("./chats/") / f"{user_anon_id}_{current_bot}"
+        path = Path("./chats/") / f"{user_anon_id}_{datetime.now().strftime("%Y%m%d%H%M%S%f")}_{current_bot}"
         with path.open("w", encoding="utf-8") as f:
             json.dump(messages, f, indent=2)
 
