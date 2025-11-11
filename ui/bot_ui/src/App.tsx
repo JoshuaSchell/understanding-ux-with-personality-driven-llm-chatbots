@@ -77,6 +77,7 @@ export default function App() {
     };
     setMessages((prev) => [...prev, myMsg]);
     setDraft("");
+    console.log("sending message to id:", current_ID);
 
     try {
       setBusy(true);
