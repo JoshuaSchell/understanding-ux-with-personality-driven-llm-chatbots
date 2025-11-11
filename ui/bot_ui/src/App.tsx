@@ -20,9 +20,9 @@ const bots_randomized = shuffle(bots_unrandomized);
 
 export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: crypto.randomUUID(), bot: 0, from: "bot", text: "Hey I'm Ada!" },
-    { id: crypto.randomUUID(), bot: 1, from: "bot", text: "Hey I'm Maya" },
-    { id: crypto.randomUUID(), bot: 2, from: "bot", text: "Hey I'm Evi" },
+    { id: crypto.randomUUID(), bot: 0, from: "bot", text: "Hey I'm Ada! A fun and flirtatious bot;" },
+    { id: crypto.randomUUID(), bot: 1, from: "bot", text: "Hey I'm Maya, a productivity oriented bot with nerd wit" },
+    { id: crypto.randomUUID(), bot: 2, from: "bot", text: "Hey I'm Evi, An emotional buddy bot" },
   ]);
 
   const [current_ID, setCurrent_ID] = useState<number>(0);
@@ -154,6 +154,7 @@ export default function App() {
             </div>
           );
         })}
+        <div id={busy ? "bubble-them-blank" : "none"}>Typing ...</div>
         <div ref={endRef} />
       </main>
 
