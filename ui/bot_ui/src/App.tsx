@@ -154,6 +154,7 @@ export default function App() {
             </div>
           );
         })}
+        <div id={busy ? "bubble-them-blank" : "none"}>Typing ...</div>
         <div ref={endRef} />
       </main>
 
