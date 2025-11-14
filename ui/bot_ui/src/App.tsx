@@ -32,6 +32,7 @@ export default function App() {
   const [botIndex, setBotIndex] = useState<number>(0);
   const [bots, setBots] = useState<[string, number][]>(bots_randomized);
   const initializedRef = useRef(false);
+  const [isDone, setDone] = useState(false);
 
   useEffect(() => {
     if (initializedRef.current) return; // already ran once
@@ -55,6 +56,23 @@ export default function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const done = async () => {
+    console.log("sending done");
+    try {
+      setBusy(true);
+      const res = await fetch("/api/done", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({  }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
     } catch (err: any) {
@@ -128,13 +146,25 @@ export default function App() {
   };
 
   const handleBotChange = () => {
+    if (botIndex >= bots.length - 1) {
+      void done();
+      setDone(true);
+    } else {
     const id = bots[botIndex + 1][1];
     setBotIndex(botIndex + 1);
     setCurrent_ID(id);
     void sendInitalize(id);
+    }
   }
   
-
+  if (isDone) {
+    return (
+      <div id="app">
+        <h2>Thank you for participating in the study!</h2>
+        <p>You have completed all conversations.</p>
+      </div>
+    );
+  }
   return (
     <div id="app">
       <div id="chat">
@@ -182,9 +212,8 @@ export default function App() {
     <div id = "next-bot-container">
     <button
           onClick={() => handleBotChange()}
-          disabled={botIndex >= bots.length - 1}
         >
-        I'm done, Move onto next conversation
+          {botIndex >= bots.length - 1 ? "Complete Study" : "I'm done, Move onto next conversation"}
         </button>
         </div>
     </div>
