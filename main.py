@@ -35,12 +35,7 @@ CORS(app)  # Enable CORS for all routes
 @app.route("/api/initialize", methods=["POST"])
 def initialize():
     """Initialize the chatbot."""
-    global user_anon_id
-    global current_bot
-    global messages
-    global ALLOWED_BOT_CODES
-    global BASE_MODEL
-    global PROMPTS
+    global ALLOWED_BOT_CODES, BASE_MODEL, PROMPTS, current_bot, messages, user_anon_id
 
     if user_anon_id is None:
         user_anon_id = f"{uuid.uuid4()}"
@@ -80,8 +75,7 @@ def initialize():
 @app.route("/api/send_message", methods=["POST"])
 def message():
     """message handle"""
-    global messages
-    global BASE_MODEL
+    global BASE_MODEL, messages
 
     data = request.get_json(force=True)
 
@@ -99,6 +93,8 @@ def message():
 
 @app.route("/api/done", methods=["POST"])
 def done():
+    global current_bot, messages, user_anon_id
+
     if messages:
         path = (
             Path("./chats/")
@@ -106,6 +102,10 @@ def done():
         )
         with path.open("w", encoding="utf-8") as f:
             json.dump(messages, f, indent=2)
+
+    current_bot = None
+    messages = []
+    user_anon_id = None
 
     return jsonify({"status": "ack"}), 200
 
